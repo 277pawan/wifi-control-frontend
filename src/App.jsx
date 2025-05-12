@@ -148,7 +148,29 @@ function App() {
             </button>
             <div className="output">
               <h4>Output:</h4>
-              <pre>{output || "No output yet"}</pre>
+              {output ? (
+                typeof output === "string" ? (
+                  <pre>{output}</pre>
+                ) : (
+                  output.base64 && (
+                    <>
+                      <img
+                        src={output.base64}
+                        alt="Generated Output"
+                        style={{ maxWidth: "100%", height: "auto" }}
+                      />
+                      <a
+                        href={output.filepath || output.base64}
+                        download="output-image.png"
+                      >
+                        <button>Download Image</button>
+                      </a>
+                    </>
+                  )
+                )
+              ) : (
+                <pre>No output yet</pre>
+              )}
             </div>
           </div>
         </div>
