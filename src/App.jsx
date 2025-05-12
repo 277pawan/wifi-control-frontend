@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
@@ -11,7 +10,7 @@ function App() {
   const [output, setOutput] = useState("");
   const [status, setStatus] = useState("");
 
-  const API_URL = "http://localhost:3001/api";
+  const API_URL = import.meta.env.VITE_API_URL || `http://localhost:3001/api/`;
   const API_KEY = "Pawan_Bisht"; // In prod, use environment variables
 
   const wifiOff = "wifi-off";
@@ -23,7 +22,7 @@ function App() {
   const fetchLaptops = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://localhost:3001/api/laptops`, {
+      const response = await axios.get(`${API_URL}laptops`, {
         headers: { "X-API-Key": API_KEY },
       });
       setLaptops(response.data.laptops);
@@ -45,7 +44,7 @@ function App() {
     try {
       console.log(selectedLaptop);
       const response = await axios.post(
-        `${API_URL}/control/wifi/off`,
+        `${API_URL}control/wifi/off`,
         { laptopId: selectedLaptop.id, type: type },
         { headers: { "X-API-Key": API_KEY } },
       );
@@ -67,7 +66,7 @@ function App() {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${API_URL}/control/execute`,
+        `${API_URL}control/execute`,
         {
           laptopId: selectedLaptop.id,
           command: command,
