@@ -1,42 +1,310 @@
-#root {
-  max-width: 1280px;
+/* App.css - Styling for Remote Laptop Management System */
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f5f7fa;
+}
+
+.main--container {
+  height: auto;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.app-container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
   text-align: center;
+  font-size: 2.5rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 1rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+h2 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+h3 {
+  color: #34495e;
+  margin-bottom: 0.8rem;
+  font-size: 1.4rem;
+}
+
+h4 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+button {
+  cursor: pointer;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #3498db;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+input {
+  padding: 0.7rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Laptop list styles */
+.laptop-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.laptop-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.laptop-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-color: #3498db;
+}
+
+.laptop-card.selected {
+  border: 2px solid #3498db;
+  background-color: #ebf5fb;
+}
+
+.laptop-card h3 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.laptop-card p {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+/* Control card styles */
+.control-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+button.danger {
+  background-color: #e74c3c;
+}
+
+button.danger:hover {
+  background-color: #c0392b;
+}
+
+button.success {
+  background-color: #2ecc71;
+}
+
+button.success:hover {
+  background-color: #27ae60;
+}
+
+.refresh-button {
+  background-color: #9b59b6;
+  margin-bottom: 1rem;
+}
+
+.refresh-button:hover {
+  background-color: #8e44ad;
+}
+
+.execute-button {
+  background-color: #f39c12;
+}
+
+.execute-button:hover {
+  background-color: #d35400;
+}
+
+/* Output styles */
+.output-container {
+  background-color: #2c3e50;
+  border-radius: 6px;
+  padding: 1rem;
+  color: white;
+  margin-top: 1rem;
+}
+
+.text-output {
+  background-color: #34495e;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font-family: "Courier New", Courier, monospace;
+  color: #f1c40f;
+}
+
+.file-output {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.output-image {
+  max-width: 100%;
+  max-height: 500px;
+  border-radius: 4px;
+  border: 2px solid #3498db;
+}
+
+.download-button {
+  background-color: #3498db;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  text-align: center;
+  width: auto;
+}
+
+.download-link {
+  text-decoration: none;
+}
+
+.status {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left: 4px solid #3498db;
+  color: #2c3e50;
+}
+
+.loading-indicator {
+  color: #3498db;
+  text-align: center;
+  font-weight: 600;
+  margin: 1rem 0;
+}
+
+.no-devices {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  color: #7f8c8d;
+}
+
+.no-output {
+  text-align: center;
+  padding: 1rem;
+  font-style: italic;
+  color: #bdc3c7;
+}
+
+.command-input-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.command-input {
+  flex-grow: 1;
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .laptop-list {
+    grid-template-columns: 1fr;
   }
-  to {
-    transform: rotate(360deg);
+
+  .button-group {
+    flex-direction: column;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .command-input-container {
+    flex-direction: column;
   }
-}
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  button {
+    width: 100%;
+    margin-right: 0;
+  }
 }

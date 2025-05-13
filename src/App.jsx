@@ -105,126 +105,130 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <h1>Remote Laptop Management System</h1>
+    <div className="main--container">
+      <div className="app-container">
+        <h1>Remote Laptop Management System</h1>
 
-      <div className="section">
-        <h2>Available Devices</h2>
-        <button
-          onClick={fetchLaptops}
-          disabled={isLoading}
-          className="refresh-button"
-        >
-          {isLoading ? "Scanning..." : "Scan for Devices"}
-        </button>
-
-        {isLoading && <p className="loading-indicator">Loading...</p>}
-
-        <div className="laptop-list">
-          {laptops.length > 0 ? (
-            laptops.map((laptop) => (
-              <div
-                key={laptop.id}
-                className={`laptop-card ${selectedLaptop?.id === laptop.id ? "selected" : ""}`}
-                onClick={() => setSelectedLaptop(laptop)}
-              >
-                <h3>{laptop.name}</h3>
-                <p>
-                  <strong>Status:</strong> {laptop.status || "Connected"}
-                </p>
-                <p>
-                  <strong>Last Connected:</strong>{" "}
-                  {new Date(laptop.connectionTime).toLocaleString()}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p className="no-devices">
-              No devices found. Click "Scan for Devices" to refresh.
-            </p>
-          )}
-        </div>
-      </div>
-
-      {selectedLaptop && (
         <div className="section">
-          <h2>Device Control: {selectedLaptop.name}</h2>
+          <h2>Available Devices</h2>
+          <button
+            onClick={fetchLaptops}
+            disabled={isLoading}
+            className="refresh-button"
+          >
+            {isLoading ? "Scanning..." : "Scan for Devices"}
+          </button>
 
-          <div className="control-card">
-            <h3>Network Controls</h3>
+          {isLoading && <p className="loading-indicator">Loading...</p>}
 
-            <div className="button-group">
-              <button
-                onClick={() => turnOffWifi(wifiOff)}
-                className="danger"
-                disabled={isLoading}
-              >
-                Disable WiFi
-              </button>
-
-              <button
-                onClick={() => turnOffWifi(wifiOn)}
-                className="success"
-                disabled={isLoading}
-              >
-                Enable WiFi
-              </button>
-            </div>
-
-            {status && <p className="status">{status}</p>}
-          </div>
-
-          <div className="control-card">
-            <h3>Remote Command Execution</h3>
-            <div className="command-input-container">
-              <input
-                value={command}
-                onChange={(e) => setCommand(e.target.value)}
-                disabled={isLoading}
-                placeholder="Enter command to execute..."
-                className="command-input"
-              />
-              <button
-                onClick={executeCommand}
-                disabled={isLoading}
-                className="execute-button"
-              >
-                {isLoading ? "Executing..." : "Execute"}
-              </button>
-            </div>
-
-            <div className="output-container">
-              <h4>Command Output:</h4>
-
-              {!output && <p className="no-output">No output available</p>}
-
-              {output && typeof output === "string" && (
-                <pre className="text-output">{output}</pre>
-              )}
-
-              {output && hasFilePath(output) && (
-                <div className="file-output">
-                  <div className="image-container">
-                    <img
-                      src={getFilePath(output)}
-                      alt="Command Output"
-                      className="output-image"
-                    />
-                  </div>
-                  <a
-                    href={getFilePath(output)}
-                    download={getFileName(getFilePath(output))}
-                    className="download-link"
-                    target="_blank"
-                  >
-                    <button className="download-button">Download Image</button>
-                  </a>
+          <div className="laptop-list">
+            {laptops.length > 0 ? (
+              laptops.map((laptop) => (
+                <div
+                  key={laptop.id}
+                  className={`laptop-card ${selectedLaptop?.id === laptop.id ? "selected" : ""}`}
+                  onClick={() => setSelectedLaptop(laptop)}
+                >
+                  <h3>{laptop.name}</h3>
+                  <p>
+                    <strong>Status:</strong> {laptop.status || "Connected"}
+                  </p>
+                  <p>
+                    <strong>Last Connected:</strong>{" "}
+                    {new Date(laptop.connectionTime).toLocaleString()}
+                  </p>
                 </div>
-              )}
-            </div>
+              ))
+            ) : (
+              <p className="no-devices">
+                No devices found. Click "Scan for Devices" to refresh.
+              </p>
+            )}
           </div>
         </div>
-      )}
+
+        {selectedLaptop && (
+          <div className="section">
+            <h2>Device Control: {selectedLaptop.name}</h2>
+
+            <div className="control-card">
+              <h3>Network Controls</h3>
+
+              <div className="button-group">
+                <button
+                  onClick={() => turnOffWifi(wifiOff)}
+                  className="danger"
+                  disabled={isLoading}
+                >
+                  Disable WiFi
+                </button>
+
+                <button
+                  onClick={() => turnOffWifi(wifiOn)}
+                  className="success"
+                  disabled={isLoading}
+                >
+                  Enable WiFi
+                </button>
+              </div>
+
+              {status && <p className="status">{status}</p>}
+            </div>
+
+            <div className="control-card">
+              <h3>Remote Command Execution</h3>
+              <div className="command-input-container">
+                <input
+                  value={command}
+                  onChange={(e) => setCommand(e.target.value)}
+                  disabled={isLoading}
+                  placeholder="Enter command to execute..."
+                  className="command-input"
+                />
+                <button
+                  onClick={executeCommand}
+                  disabled={isLoading}
+                  className="execute-button"
+                >
+                  {isLoading ? "Executing..." : "Execute"}
+                </button>
+              </div>
+
+              <div className="output-container">
+                <h4>Command Output:</h4>
+
+                {!output && <p className="no-output">No output available</p>}
+
+                {output && typeof output === "string" && (
+                  <pre className="text-output">{output}</pre>
+                )}
+
+                {output && hasFilePath(output) && (
+                  <div className="file-output">
+                    <div className="image-container">
+                      <img
+                        src={getFilePath(output)}
+                        alt="Command Output"
+                        className="output-image"
+                      />
+                    </div>
+                    <a
+                      href={getFilePath(output)}
+                      download={getFileName(getFilePath(output))}
+                      className="download-link"
+                      target="_blank"
+                    >
+                      <button className="download-button">
+                        Download Image
+                      </button>
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
