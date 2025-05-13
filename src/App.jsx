@@ -15,6 +15,7 @@ function App() {
 
   const wifiOff = "wifi-off";
   const wifiOn = "wifi-on";
+
   useEffect(() => {
     fetchLaptops();
   }, []);
@@ -42,16 +43,15 @@ function App() {
 
     setIsLoading(true);
     try {
-      console.log(selectedLaptop);
       const response = await axios.post(
-        `${API_URL}control/wifi/off`,
+        `${API_URL}control/wifi/${type === wifiOff ? "off" : "on"}`,
         { laptopId: selectedLaptop.id, type: type },
         { headers: { "X-API-Key": API_KEY } },
       );
       setStatus(response.data.message);
     } catch (error) {
-      console.error("Error turning off WiFi:", error);
-      setStatus("Failed to turn off/on WiFi");
+      console.error(`Error controlling WiFi (${type}):`, error);
+      setStatus(`Failed to ${type === wifiOff ? "turn off" : "turn on"} WiFi`);
     } finally {
       setIsLoading(false);
     }
@@ -64,6 +64,7 @@ function App() {
     }
 
     setIsLoading(true);
+    setOutput(""); // Clear previous output
     try {
       const response = await axios.post(
         `${API_URL}control/execute`,
@@ -83,93 +84,142 @@ function App() {
     }
   };
 
+  // Function to determine if output contains a file path
+  const hasFilePath = (outputData) => {
+    return (
+      outputData &&
+      typeof outputData === "object" &&
+      (outputData.filePath || outputData.filepath)
+    );
+  };
+
+  // Function to get correct file path
+  const getFilePath = (outputData) => {
+    return outputData.filePath || outputData.filepath;
+  };
+
+  // Function to get file name from path
+  const getFileName = (path) => {
+    if (!path) return "download";
+    return path.split("screenshots/").pop() || "download";
+  };
+
   return (
     <div className="app-container">
-      <h1>Remote Laptop Control</h1>
+      <h1>Remote Laptop Management System</h1>
 
       <div className="section">
-        <h2>Connected Laptops</h2>
-        <button onClick={fetchLaptops} disabled={isLoading}>
-          {isLoading ? "Refreshing..." : "Refresh List"}
+        <h2>Available Devices</h2>
+        <button
+          onClick={fetchLaptops}
+          disabled={isLoading}
+          className="refresh-button"
+        >
+          {isLoading ? "Scanning..." : "Scan for Devices"}
         </button>
 
-        {isLoading && <p>Loading...</p>}
+        {isLoading && <p className="loading-indicator">Loading...</p>}
 
         <div className="laptop-list">
-          {laptops.map((laptop) => (
-            <div
-              key={laptop.id}
-              className={`laptop-card ${selectedLaptop?.id === laptop.id ? "selected" : ""}`}
-              onClick={() => setSelectedLaptop(laptop)}
-            >
-              <h3>{laptop.name}</h3>
-              <p>
-                Connected: {new Date(laptop.connectionTime).toLocaleString()}
-              </p>
-            </div>
-          ))}
+          {laptops.length > 0 ? (
+            laptops.map((laptop) => (
+              <div
+                key={laptop.id}
+                className={`laptop-card ${selectedLaptop?.id === laptop.id ? "selected" : ""}`}
+                onClick={() => setSelectedLaptop(laptop)}
+              >
+                <h3>{laptop.name}</h3>
+                <p>
+                  <strong>Status:</strong> {laptop.status || "Connected"}
+                </p>
+                <p>
+                  <strong>Last Connected:</strong>{" "}
+                  {new Date(laptop.connectionTime).toLocaleString()}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="no-devices">
+              No devices found. Click "Scan for Devices" to refresh.
+            </p>
+          )}
         </div>
       </div>
 
       {selectedLaptop && (
         <div className="section">
-          <h2>Control Panel: {selectedLaptop.name}</h2>
+          <h2>Device Control: {selectedLaptop.name}</h2>
 
           <div className="control-card">
-            <h3>WiFi Control</h3>
+            <h3>Network Controls</h3>
 
-            <button
-              onClick={() => turnOffWifi(wifiOff)}
-              className="danger"
-              disabled={isLoading}
-            >
-              Turn Off WiFi
-            </button>
+            <div className="button-group">
+              <button
+                onClick={() => turnOffWifi(wifiOff)}
+                className="danger"
+                disabled={isLoading}
+              >
+                Disable WiFi
+              </button>
 
-            <button
-              onClick={() => turnOffWifi(wifiOn)}
-              className="danger"
-              disabled={isLoading}
-            >
-              Turn On WiFi
-            </button>
+              <button
+                onClick={() => turnOffWifi(wifiOn)}
+                className="success"
+                disabled={isLoading}
+              >
+                Enable WiFi
+              </button>
+            </div>
+
             {status && <p className="status">{status}</p>}
           </div>
 
           <div className="control-card">
-            <h3>Execute Command</h3>
-            <input
-              value={command}
-              onChange={(e) => setCommand(e.target.value)}
-              disabled={isLoading}
-            ></input>
-            <button onClick={executeCommand} disabled={isLoading}>
-              Execute
-            </button>
-            <div className="output">
-              <h4>Output:</h4>
-              {output ? (
-                typeof output === "string" ? (
-                  <pre>{output}</pre>
-                ) : (
-                  output.filepath && (
-                    <>
-                      <img
-                        src={output.filePath}
-                        alt="Generated Output"
-                        style={{ maxWidth: "100%", height: "auto" }}
-                      />
-                      <a
-                        href={output.filepath}
-                        download={output.filePath.split("screenshots/").pop()}
-                      >
-                        <button>Download Image</button>
-                      </a>
-                    </>
-                  )
-                )
-              ) : (
-                <pre>No output yet</pre>
+            <h3>Remote Command Execution</h3>
+            <div className="command-input-container">
+              <input
+                value={command}
+                onChange={(e) => setCommand(e.target.value)}
+                disabled={isLoading}
+                placeholder="Enter command to execute..."
+                className="command-input"
+              />
+              <button
+                onClick={executeCommand}
+                disabled={isLoading}
+                className="execute-button"
+              >
+                {isLoading ? "Executing..." : "Execute"}
+              </button>
+            </div>
+
+            <div className="output-container">
+              <h4>Command Output:</h4>
+
+              {!output && <p className="no-output">No output available</p>}
+
+              {output && typeof output === "string" && (
+                <pre className="text-output">{output}</pre>
+              )}
+
+              {output && hasFilePath(output) && (
+                <div className="file-output">
+                  <div className="image-container">
+                    <img
+                      src={getFilePath(output)}
+                      alt="Command Output"
+                      className="output-image"
+                    />
+                  </div>
+                  <a
+                    href={getFilePath(output)}
+                    download={getFileName(getFilePath(output))}
+                    className="download-link"
+                    target="_blank"
+                  >
+                    <button className="download-button">Download Image</button>
+                  </a>
+                </div>
               )}
             </div>
           </div>
