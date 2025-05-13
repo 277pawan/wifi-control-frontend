@@ -152,7 +152,7 @@ function App() {
                 typeof output === "string" ? (
                   <pre>{output}</pre>
                 ) : (
-                  output.filePath && (
+                  output.filepath && (
                     <>
                       <img
                         src={output.filePath}
