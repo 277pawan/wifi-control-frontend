@@ -152,16 +152,16 @@ function App() {
                 typeof output === "string" ? (
                   <pre>{output}</pre>
                 ) : (
-                  output.base64 && (
+                  output.filePath && (
                     <>
                       <img
-                        src={output.base64}
+                        src={output.filePath}
                         alt="Generated Output"
                         style={{ maxWidth: "100%", height: "auto" }}
                       />
                       <a
-                        href={output.filepath || output.base64}
-                        download="output-image.png"
+                        href={output.filepath}
+                        download={output.filePath.split("screenshots/").pop()}
                       >
                         <button>Download Image</button>
                       </a>
