@@ -44,7 +44,7 @@ function App() {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${API_URL}control/wifi/${type === wifiOff ? "off" : "on"}`,
+        `${API_URL}control/wifi/off`,
         { laptopId: selectedLaptop.id, type: type },
         { headers: { "X-API-Key": API_KEY } },
       );
